@@ -50,6 +50,12 @@ var (
 )
 
 func main() {
+    port := os.Getenv("PORT")
+
+    if port == "" {
+        port = "5080"
+    }
+
 	router := mux.NewRouter()
 
 	ticker := time.NewTicker(clearCachePeriod)
@@ -153,7 +159,7 @@ func main() {
 
 	srv := &http.Server{
 		Handler:      router,
-		Addr:         ":5080",
+		Addr:         ":" + port,
 		WriteTimeout: socketTimeOut,
 		ReadTimeout:  socketTimeOut,
 	}

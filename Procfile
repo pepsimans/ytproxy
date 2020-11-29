@@ -1,1 +1,1 @@
-web: proxy
+web: bin/proxy
