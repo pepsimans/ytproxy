@@ -30,7 +30,7 @@ const (
 )
 
 const (
-	clearCachePeriod = 2 * time.Minute
+	clearCachePeriod = 20 * time.Minute
 	cacheTTL = 1 * time.Hour
 
 	socketTimeOut = 10 * time.Minute
@@ -62,6 +62,8 @@ func main() {
 	defer ticker.Stop()
 
 	go func() {
+	    myurl := os.Getenv("MY_URL")
+
 		for {
 			<-ticker.C
 
@@ -73,11 +75,22 @@ func main() {
 					cacheMutex.Lock()
 					delete(cache, id)
 
-					log.Print("Delete item " + id)
+					log.Printf("Delete item: %v", id)
 
 					cacheMutex.Unlock()
 				}
 			}
+
+
+            if len(myurl) > 0 {
+                response, err := http.Get(myurl)
+
+                if err != nil {
+                    log.Printf("Error fetching wake url: %v", err)
+                } else {
+                    response.Body.Close()
+                }
+            }
 
 			time.Sleep(100 * time.Microsecond)
 		}
@@ -104,10 +117,9 @@ func main() {
 		ctx := request.Context()
 		f := q.Get("f")
 
-		log.Print("Sent-" + request.Header.Get("X-Auth"))
-		log.Print("Set - " + os.Getenv("SERIAL_NO"))
-
 		if id == "" || os.Getenv("SERIAL_NO") != request.Header.Get("X-Auth") {
+		    log.Print("Sent key %v, expected %v", request.Header.Get("X-Auth"), os.Getenv("SERIAL_NO"))
+
 			writer.WriteHeader(httpCodeWrongRequest)
 			return
 		}
@@ -139,7 +151,7 @@ func main() {
 			}
 		}
 
-		log.Print("Selected format: " + selected)
+		log.Print("Selected format: %v", selected)
 
 		out2, err := proxyCall(ctx, id, selected)
 		if err != nil {
