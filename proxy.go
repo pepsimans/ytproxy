@@ -118,7 +118,7 @@ func main() {
 		f := q.Get("f")
 
 		if id == "" || os.Getenv("SERIAL_NO") != request.Header.Get("X-Auth") {
-		    log.Print("Sent key %v, expected %v", request.Header.Get("X-Auth"), os.Getenv("SERIAL_NO"))
+		    log.Printf("Sent key %v, expected %v", request.Header.Get("X-Auth"), os.Getenv("SERIAL_NO"))
 
 			writer.WriteHeader(httpCodeWrongRequest)
 			return

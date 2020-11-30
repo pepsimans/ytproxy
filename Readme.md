@@ -18,7 +18,7 @@ Original Youtube proxy script have performed 3 requests to the Youtube site, and
 `heroku create --manifest`
 
 4. Deploy project
-`git push heroku main`
+`git push heroku master`
 
 5. Script can be executed via GET path
 `http://<your-heroku-project-name>/get_url?id=<youtubeVideoId>`
