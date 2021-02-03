@@ -24,6 +24,7 @@ const (
 	methodGetFormat = "GET_FORMAT"
 	defaultDpi	  = "720p"
 	defaultFormat = "best[ext=mp4]"
+	defaultFormatId = "22"
 
 	httpCodeWrongRequest = 400
 	httpCodeError = 500
@@ -117,6 +118,9 @@ func main() {
 		ctx := request.Context()
 		f := q.Get("f")
 
+		var out2 []byte
+        var err error
+
 		if id == "" || os.Getenv("SERIAL_NO") != request.Header.Get("X-Auth") {
 		    log.Printf("Sent key %v, expected %v", request.Header.Get("X-Auth"), os.Getenv("SERIAL_NO"))
 
@@ -126,39 +130,45 @@ func main() {
 
 		if f == "" {
 			f = defaultDpi
+
+			log.Print("Trying to get url for deafult format: %v", defaultFormatId)
+
+            out2, err = proxyCall(ctx, id, defaultFormatId)
 		}
 
-		out, err := proxyCall(ctx, id, methodGetFormat)
-		if err != nil {
-			writer.WriteHeader(httpCodeError)
-			_, _ = writer.Write([]byte(err.Error()))
-			return
-		}
+        if err != nil {
+            out, err := proxyCall(ctx, id, methodGetFormat)
+            if err != nil {
+                writer.WriteHeader(httpCodeError)
+                _, _ = writer.Write([]byte(err.Error()))
+                return
+            }
 
-		// Ok, now we need to find best format
-		res := regex.FindAllSubmatch(out, -1)
+            // Ok, now we need to find best format
+            res := regex.FindAllSubmatch(out, -1)
 
-		l := len(res)
-		selected := defaultFormat
+            l := len(res)
+            selected := defaultFormat
 
-		for i := range res {
-			k := l - (i + 1)
-			dpi := string(res[k][3])
-			fid := string(res[k][1])
+            for i := range res {
+                k := l - (i + 1)
+                dpi := string(res[k][3])
+                fid := string(res[k][1])
 
-			if f == dpi || selected == defaultFormat {
-				selected = fid
-			}
-		}
+                if f == dpi || selected == defaultFormat {
+                    selected = fid
+                }
+            }
 
-		log.Print("Selected format: %v", selected)
+            log.Print("Selected format: %v", selected)
 
-		out2, err := proxyCall(ctx, id, selected)
-		if err != nil {
-			writer.WriteHeader(httpCodeError)
-			_, _ = writer.Write([]byte(err.Error()))
+            out2, err = proxyCall(ctx, id, selected)
+            if err != nil {
+                writer.WriteHeader(httpCodeError)
+                _, _ = writer.Write([]byte(err.Error()))
 
-			return
+                return
+            }
 		}
 
 		cacheMutex.Lock()
