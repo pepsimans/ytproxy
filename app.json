@@ -1,0 +1,15 @@
+{
+  "name": "ytpx",
+  "description": "ytpx",
+  "logo": "https://www.gstatic.com/ac/cb/youtube_logo_v2.svg",
+  "keywords": [
+    "telegram",
+    "best",
+    "video",
+    "compress",
+    "bot"
+  ],
+  "repository": "https://github.com/ebogdanov/ytproxy"
+  },
+  "stack": "container"
+}
