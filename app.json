@@ -5,6 +5,6 @@
   "keywords": [
     "yt"
   ],
-  "repository": "https://github.com/ebogdanov/ytproxy"
+  "repository": "https://github.com/ebogdanov/ytproxy",
   "stack": "container"
 }
